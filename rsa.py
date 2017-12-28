@@ -1,7 +1,7 @@
 """
 	PeerCrypt
 
-	Copyright (c) 2014-2018, Madd Games.
+	Copyright (c) 2018, Madd Games.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
