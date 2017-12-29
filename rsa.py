@@ -77,4 +77,4 @@ def generatePrime(size):
 	
 	
 if __name__ == "__main__":
-    print generatePrime()
+    print generatePrime(2048)
