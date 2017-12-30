@@ -28,6 +28,23 @@
 
 from rsa import *
 
+"""
+List of ciphers.
+
+Each entry is a tuple describing a single cipher. The elements of the tuple, in order, are:
+
+	0	id				A unique cipher ID used in key files as well as the protocol.
+	1	name				Name of the cipher; a human-readable identifier for commands etc.
+	2	keygen()			A function which takes no arguments and returns a description of a new key.
+	3	keystr(key)			Returns a public key string used to identify the public part of the key, in such a way that
+						it can be copied by a human and pasted somewhere.
+	4	keystore(key, filename)		Save the given key description into a ".key" file.
+	5	keyload(f)			Load a key description (and return it) from the given file pointer, whose position is right be
+						beyond the cipher ID in the file.
+	6	sign(m, key)			Return the signature for hashed message "m" using the given key.
+	7	verify(m, sig, keystr)		Verify that the signautre "sig" is valid for message "m" with public key string "keystr" (as given
+						by keystr() )
+"""
 cipherList = [
 	(0x0001, 'RSA4096-DH2048-AES128', rsa4096_keygen, rsa4096_keystr, rsa4096_keystore, rsa4096_keyload, rsa4096_sign, rsa4096_verify)
 ]
