@@ -28,6 +28,7 @@
 
 import math
 import random
+import tools
 
 def generatePrime(size):
 	n = 0
@@ -51,7 +52,7 @@ def generatePrime(size):
 					break
 					
 			
-			if pow(2, n-1, n) == 1:		#Fermat test
+			if pow(2, n-1, n) == 1:			#Fermat test
 				break
 		
 		r, s = 0, n - 1
@@ -74,7 +75,85 @@ def generatePrime(size):
 				break
 	return n
 	
+def generateKey(size):
+	p = generatePrime(size/2)
+	q = generatePrime(size/2)
+	n = p*q
+	
+	e = 65537
+	
+	def egcd(a, b):
+		if a == 0:
+			return (b, 0, 1)
+		else:
+			g, y, x = egcd(b % a, a)
+			return (g, x - (b // a) * y, y)
+			
+	k = (p-1) * (q-1)
+	
+	def modinv(a, m):
+		g, x, y = egcd(a, m)
+		if g != 1:
+			raise Exception('modular inverse does not exist')
+		else:
+			return x % m
+		
+	d = modinv(e, k)
 	
 	
+	return (n, d)
+	
+def rsa4096_keygen():
+	return generateKey(4096)
+	
+def rsa4096_keystore(key, name):
+	f = open(name, "wb")
+	f.write("KEY\0\0\1")
+	f.write(tools.longToBigEndian(key[0], 512))
+	f.write(tools.longToBigEndian(key[1], 512))
+	f.close()
+	
+
+def rsa4096_keystr(key):
+	n=key[0]
+	alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._"
+	s = ""
+	while n != 0:
+		d = n%64
+		n = n/64
+		s = alphabet[d] + s
+	return "RSA4096/" + s
+
+def rsa4096_keyload(f):
+	nstr = f.read(512)
+	dstr = f.read(512)
+	
+	if (len(nstr) != 512) or (len(dstr) != 512):
+		raise Exception('RSA4096 key corrupted')
+
+	end = f.read(1)
+	if end != "":
+		raise Exception('RSA4096 key corrupted')
+	
+	n = tools.bigEndianToLong(nstr)
+	d = tools.bigEndianToLong(dstr)
+	return (n, d)
+
+def rsa4096_sign(m, key):
+	n, d = key
+	return pow(m, d, n)
+
+def rsa4096_verify(m, sig, keystr):
+	if not keystr.startswith("RSA4096/"):
+		return False
+	s = keystr.split("/", 1)[1]
+	alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._"
+	n = 0
+	for c in s:
+		if c not in alphabet:
+			return False
+		n = n * 64 + alphabet.find(c)
+	return pow(sig, 65537, n) == m
+
 if __name__ == "__main__":
-    print generatePrime(2048)
+    print generateKey(4096)
