@@ -49,6 +49,8 @@ cipherList = [
 	(0x0001, 'RSA4096-DH2048-AES128', rsa4096_keygen, rsa4096_keystr, rsa4096_keystore, rsa4096_keyload, rsa4096_sign, rsa4096_verify)
 ]
 
+RECOMMENDED_CIPHER = 'RSA4096-DH2048-AES128'
+
 def getCipherByName(name):
 	for cipher in cipherList:
 		if cipher[1] == name:
