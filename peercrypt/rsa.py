@@ -29,6 +29,7 @@
 import math
 import random
 import tools
+from oaep import *
 
 def generatePrime(size):
 	n = 0
@@ -141,6 +142,8 @@ def rsa4096_keyload(f):
 
 def rsa4096_sign(m, key):
 	n, d = key
+	m = sha256(m, 256)
+	m = oaep_encode(m)
 	return pow(m, d, n)
 
 def rsa4096_verify(m, sig, keystr):
@@ -153,7 +156,7 @@ def rsa4096_verify(m, sig, keystr):
 		if c not in alphabet:
 			return False
 		n = n * 64 + alphabet.find(c)
-	return pow(sig, 65537, n) == m
-
-if __name__ == "__main__":
-    print generateKey(4096)
+	h = sha256(m, 256)
+	p = pow(sig, 65537, n)
+	p = oaep_decode(p)
+	return p == h
